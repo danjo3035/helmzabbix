@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zabbix-server
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: zabbix-server
+  template:
+    metadata:
+      labels:
+        app: zabbix-server
+    spec:
+      containers:
+        - name: zabbix-server
+          image: {{ .Values.zabbix.serverImage }}
+          env:
+            - name: DB_SERVER_HOST
+              value: postgres
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgresql.password }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresql.database }}
+          volumeMounts:
+            - name: zabbix-data
+              mountPath: /var/lib/zabbix
+      volumes:
+        - name: zabbix-data
+          persistentVolumeClaim:
+            claimName: zabbix-server-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-server
+spec:
+  selector:
+    app: zabbix-server
+  ports:
+    - protocol: TCP
+      port: 10051
+      targetPort: 10051

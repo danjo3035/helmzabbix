@@ -1,0 +1,17 @@
+replicaCount: 1
+
+postgresql:
+  image: postgres:15
+  user: zabbix
+  password: zabbix_pass
+  database: zabbix
+  storage: 5Gi
+
+zabbix:
+  serverImage: zabbix/zabbix-server-pgsql:alpine-7.0-latest
+  frontendImage: zabbix/zabbix-web-apache-pgsql:alpine-7.0-latest
+  serverStorage: 5Gi
+
+ingress:
+  enabled: true
+  host: zabbix.cloudmagazine.local
